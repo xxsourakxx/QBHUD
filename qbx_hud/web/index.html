@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>qbx_hud</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <main id="hud" class="hud bottom-left">
+        <section class="status-panel" id="statusPanel">
+            <article class="status-row" data-key="health">
+                <div class="status-icon-wrap"><img src="assets/icons/health.svg" alt="health" /></div>
+                <div class="status-main">
+                    <header>Health</header>
+                    <div class="bar-track"><div class="bar-fill" id="bar-health"></div></div>
+                </div>
+                <span class="status-value" id="value-health">100%</span>
+            </article>
+
+            <article class="status-row" data-key="armor">
+                <div class="status-icon-wrap"><img src="assets/icons/armor.svg" alt="armor" /></div>
+                <div class="status-main">
+                    <header>Armor</header>
+                    <div class="bar-track"><div class="bar-fill" id="bar-armor"></div></div>
+                </div>
+                <span class="status-value" id="value-armor">0%</span>
+            </article>
+
+            <article class="status-row" data-key="hunger">
+                <div class="status-icon-wrap"><img src="assets/icons/hunger.svg" alt="hunger" /></div>
+                <div class="status-main">
+                    <header>Hunger</header>
+                    <div class="bar-track"><div class="bar-fill" id="bar-hunger"></div></div>
+                </div>
+                <span class="status-value" id="value-hunger">100%</span>
+            </article>
+
+            <article class="status-row" data-key="thirst">
+                <div class="status-icon-wrap"><img src="assets/icons/thirst.svg" alt="thirst" /></div>
+                <div class="status-main">
+                    <header>Thirst</header>
+                    <div class="bar-track"><div class="bar-fill" id="bar-thirst"></div></div>
+                </div>
+                <span class="status-value" id="value-thirst">100%</span>
+            </article>
+
+            <article class="status-row" data-key="stress" id="stress-row">
+                <div class="status-icon-wrap"><img src="assets/icons/stress.svg" alt="stress" /></div>
+                <div class="status-main">
+                    <header>Stress</header>
+                    <div class="bar-track"><div class="bar-fill" id="bar-stress"></div></div>
+                </div>
+                <span class="status-value" id="value-stress">0%</span>
+            </article>
+        </section>
+
+        <aside class="voice-panel" id="voicePanel">
+            <img id="voiceIcon" src="assets/icons/voice.svg" alt="voice" />
+            <div>
+                <strong id="voiceLabel">Normal</strong>
+                <small id="voiceRange">8.0m</small>
+            </div>
+        </aside>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

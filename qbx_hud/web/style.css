@@ -1,0 +1,180 @@
+:root {
+    --panel-opacity: 0.58;
+    --panel-bg: rgba(14, 18, 30, var(--panel-opacity));
+    --panel-border: rgba(128, 189, 255, 0.22);
+    --text-main: #ebf6ff;
+    --text-muted: #9db0c0;
+    --accent: #42ffd7;
+
+    --health: #ff4d5f;
+    --armor: #62a9ff;
+    --hunger: #ffba59;
+    --thirst: #5ad9ff;
+    --stress: #be78ff;
+
+    --bar-width: 240px;
+    --bar-height: 14px;
+    --bar-spacing: 8px;
+    --bar-radius: 12px;
+    --anim-speed: 220ms;
+}
+
+* { box-sizing: border-box; user-select: none; }
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Inter, Segoe UI, Roboto, sans-serif;
+    color: var(--text-main);
+}
+
+.hud {
+    position: fixed;
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    opacity: 1;
+    transition: opacity 280ms ease;
+}
+
+.hud.bottom-left {
+    left: 2.2vw;
+    bottom: 3.4vh;
+}
+
+.hud.hidden,
+.hud.paused {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.status-panel,
+.voice-panel {
+    background: linear-gradient(160deg, rgba(22, 31, 48, 0.72), var(--panel-bg));
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+}
+
+.status-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--bar-spacing);
+    padding: 12px;
+    box-shadow: 0 0 20px rgba(66, 255, 215, 0.08);
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    transition: transform var(--anim-speed) ease;
+}
+
+.status-row.low {
+    animation: warnPulse 1.2s ease-in-out infinite;
+}
+
+.status-row[data-key='health'].low { box-shadow: 0 0 10px rgba(255, 77, 95, 0.35); }
+.status-row[data-key='hunger'].low { box-shadow: 0 0 10px rgba(255, 186, 89, 0.35); }
+.status-row[data-key='thirst'].low { box-shadow: 0 0 10px rgba(90, 217, 255, 0.35); }
+.status-row[data-key='stress'].low { box-shadow: 0 0 10px rgba(190, 120, 255, 0.35); }
+
+.status-icon-wrap {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status-icon-wrap img {
+    width: 15px;
+    height: 15px;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.24));
+}
+
+.status-main header {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.bar-track {
+    width: var(--bar-width);
+    height: var(--bar-height);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--bar-radius);
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: var(--bar-radius);
+    transition: width var(--anim-speed) ease, box-shadow var(--anim-speed) ease;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.status-value {
+    width: 44px;
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-main);
+}
+
+.voice-panel {
+    min-width: 126px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 0 14px rgba(98, 169, 255, 0.15);
+}
+
+.voice-panel img {
+    width: 20px;
+    height: 20px;
+    transition: transform 140ms ease, filter 160ms ease;
+    filter: drop-shadow(0 0 6px rgba(98, 169, 255, 0.5));
+}
+
+.voice-panel.talking img {
+    animation: speakPulse 0.6s ease infinite;
+}
+
+.voice-panel strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.voice-panel small {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+#bar-health { background: linear-gradient(90deg, #ff737d, var(--health)); color: var(--health); }
+#bar-armor { background: linear-gradient(90deg, #91c5ff, var(--armor)); color: var(--armor); }
+#bar-hunger { background: linear-gradient(90deg, #ffd086, var(--hunger)); color: var(--hunger); }
+#bar-thirst { background: linear-gradient(90deg, #87e5ff, var(--thirst)); color: var(--thirst); }
+#bar-stress { background: linear-gradient(90deg, #d8a2ff, var(--stress)); color: var(--stress); }
+
+@keyframes warnPulse {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(1.5px); }
+}
+
+@keyframes speakPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+}
