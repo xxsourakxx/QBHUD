@@ -1,15 +1,15 @@
 Config = Config or {}
 
 Config.Position = 'bottom-left'
-Config.OffsetX = 2.2 -- vw
-Config.OffsetY = 3.4 -- vh
+Config.OffsetX = 1.35 -- vw
+Config.OffsetY = 2.4 -- vh
 
-Config.BarWidth = 240
-Config.BarHeight = 14
-Config.BarSpacing = 8
-Config.BarRadius = 12
-Config.PanelOpacity = 0.58
-Config.AnimationSpeed = 220
+Config.BarWidth = 178
+Config.BarHeight = 8
+Config.BarSpacing = 5
+Config.BarRadius = 999
+Config.PanelOpacity = 0.28
+Config.AnimationSpeed = 180
 Config.EnableStress = true
 
 Config.UpdateIntervals = {
@@ -25,7 +25,7 @@ Config.Theme = {
     hunger = '#ffba59',
     thirst = '#5ad9ff',
     stress = '#be78ff',
-    panel = 'rgba(14, 18, 30, 0.58)',
+    panel = 'rgba(18, 30, 48, 0.28)',
     text = '#ebf6ff',
     muted = '#9db0c0',
     accent = '#42ffd7'
