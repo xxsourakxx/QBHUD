@@ -1,58 +1,64 @@
-local function getStatusValue(name)
-    -- Supports qbx exports as primary and event-based updates as backup.
-    local ok, value = pcall(function()
-        if exports.qbx_core and exports.qbx_core.GetStatus then
-            return exports.qbx_core:GetStatus(name)
-        end
-    end)
+local QBCore = exports['qb-core'] and exports['qb-core']:GetCoreObject() or nil
 
-    if ok and value then
-        local percent = value.percent or value.value or value
-        return math.max(0, math.min(100, tonumber(percent) or 100))
-    end
-
-    return nil
+local function getMetaValue(name)
+    if not QBCore or not QBCore.Functions then return nil end
+    local data = QBCore.Functions.GetPlayerData()
+    if not data or not data.metadata then return nil end
+    local value = data.metadata[name]
+    if value == nil then return nil end
+    return tonumber(value)
 end
+
+local function syncMetadata()
+    local hunger = getMetaValue('hunger')
+    local thirst = getMetaValue('thirst')
+    local stress = getMetaValue('stress')
+    local bleeding = getMetaValue('bleeding') or getMetaValue('isbleeding')
+
+    if hunger then UpdateHudValue('hunger', hunger) end
+    if thirst then UpdateHudValue('thirst', thirst) end
+    if stress then UpdateHudValue('stress', stress) end
+    if bleeding then UpdateBleeding(bleeding) end
+end
+
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', syncMetadata)
+RegisterNetEvent('QBCore:Player:SetPlayerData', function(playerData)
+    if type(playerData) ~= 'table' or type(playerData.metadata) ~= 'table' then return end
+
+    if playerData.metadata.hunger then UpdateHudValue('hunger', playerData.metadata.hunger) end
+    if playerData.metadata.thirst then UpdateHudValue('thirst', playerData.metadata.thirst) end
+    if playerData.metadata.stress then UpdateHudValue('stress', playerData.metadata.stress) end
+
+    local bleed = playerData.metadata.bleeding or playerData.metadata.isbleeding
+    if bleed ~= nil then UpdateBleeding(bleed) end
+end)
 
 RegisterNetEvent('hud:client:UpdateNeeds', function(newHunger, newThirst)
     if newHunger ~= nil then UpdateHudValue('hunger', newHunger) end
     if newThirst ~= nil then UpdateHudValue('thirst', newThirst) end
 end)
 
-RegisterNetEvent('qbx_hud:client:updateNeeds', function(payload)
-    if type(payload) ~= 'table' then return end
-    if payload.hunger ~= nil then UpdateHudValue('hunger', payload.hunger) end
-    if payload.thirst ~= nil then UpdateHudValue('thirst', payload.thirst) end
-    if payload.stress ~= nil and Config.EnableStress then UpdateHudValue('stress', payload.stress) end
+RegisterNetEvent('hospital:client:SetBleeding', function(level)
+    UpdateBleeding(level)
 end)
 
 CreateThread(function()
-    local ped
-
     while true do
-        ped = PlayerPedId()
+        local ped = PlayerPedId()
         if ped and ped ~= 0 then
-            local health = GetEntityHealth(ped) - 100
             local maxHealth = GetEntityMaxHealth(ped) - 100
-            local normalizedHealth = maxHealth > 0 and (health / maxHealth) * 100 or 100
-            UpdateHudValue('health', normalizedHealth)
-            UpdateHudValue('armor', GetPedArmour(ped))
+            local health = GetEntityHealth(ped) - 100
+            local value = maxHealth > 0 and (health / maxHealth) * 100 or 100
+            UpdateHudValue('health', value)
         end
 
-        Wait(Config.UpdateIntervals.healthArmor)
+        Wait(Config.UpdateIntervals.health)
     end
 end)
 
 CreateThread(function()
     while true do
-        local hunger = getStatusValue('hunger')
-        local thirst = getStatusValue('thirst')
-        local stress = getStatusValue('stress')
-
-        if hunger then UpdateHudValue('hunger', hunger) end
-        if thirst then UpdateHudValue('thirst', thirst) end
-        if stress and Config.EnableStress then UpdateHudValue('stress', stress) end
-
-        Wait(Config.UpdateIntervals.statusFallback)
+        syncMetadata()
+        Wait(Config.UpdateIntervals.needs)
     end
 end)

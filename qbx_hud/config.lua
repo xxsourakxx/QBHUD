@@ -1,34 +1,34 @@
 Config = Config or {}
 
 Config.Position = 'bottom-left'
-Config.OffsetX = 1.35 -- vw
-Config.OffsetY = 2.4 -- vh
+Config.OffsetX = 1.2 -- vw
+Config.OffsetY = 2.2 -- vh
 
-Config.BarWidth = 178
+Config.BarWidth = 118
 Config.BarHeight = 8
-Config.BarSpacing = 5
-Config.BarRadius = 999
-Config.PanelOpacity = 0.28
-Config.AnimationSpeed = 180
-Config.EnableStress = true
+Config.BarGap = 7
+Config.PanelOpacity = 0.24
+Config.AnimationSpeed = 170
 
 Config.UpdateIntervals = {
-    healthArmor = 300,
-    statusFallback = 2500,
-    voice = 150,
-    pause = 400
+    health = 250,
+    needs = 1800,
+    voice = 120,
+    pause = 350
 }
 
 Config.Theme = {
-    health = '#ff4d5f',
-    armor = '#62a9ff',
-    hunger = '#ffba59',
-    thirst = '#5ad9ff',
-    stress = '#be78ff',
-    panel = 'rgba(18, 30, 48, 0.28)',
-    text = '#ebf6ff',
-    muted = '#9db0c0',
-    accent = '#42ffd7'
+    panel = 'rgba(150, 205, 255, 0.08)',
+    text = '#e8f6ff',
+    muted = '#9ab0c2',
+    health = '#ff667a',
+    hunger = '#ffbd73',
+    thirst = '#78e7ff',
+    stress = '#c88dff',
+    bleeding = '#ff4d67',
+    whisper = '#76ccff',
+    normal = '#74ffc4',
+    shout = '#ff9b70'
 }
 
 Config.LowThresholds = {
@@ -38,8 +38,13 @@ Config.LowThresholds = {
     stress = 80
 }
 
+Config.Bleeding = {
+    maxLevel = 4,
+    pulseFromLevel = 2
+}
+
 Config.VoiceModes = {
-    [1] = { label = 'Whisper', range = 1.5, icon = '🔈', color = '#67d3ff' },
-    [2] = { label = 'Normal', range = 8.0, icon = '🔉', color = '#60ffc6' },
-    [3] = { label = 'Shout', range = 20.0, icon = '📢', color = '#ff8a5a' }
+    [1] = { label = 'Whisper', range = 1.5, icon = 'assets/icons/voice-whisper.svg', color = '#76ccff' },
+    [2] = { label = 'Normal', range = 8.0, icon = 'assets/icons/voice-normal.svg', color = '#74ffc4' },
+    [3] = { label = 'Shout', range = 20.0, icon = 'assets/icons/voice-shout.svg', color = '#ff9b70' }
 }

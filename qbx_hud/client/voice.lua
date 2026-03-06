@@ -1,18 +1,18 @@
 local currentMode = 2
 
 local function modeFromDistance(distance)
-    local nearestMode = 2
-    local nearestDiff = math.huge
+    local selected = 2
+    local diffMin = math.huge
 
     for mode, data in pairs(Config.VoiceModes) do
-        local diff = math.abs(distance - data.range)
-        if diff < nearestDiff then
-            nearestDiff = diff
-            nearestMode = mode
+        local diff = math.abs((tonumber(distance) or 8.0) - data.range)
+        if diff < diffMin then
+            diffMin = diff
+            selected = mode
         end
     end
 
-    return nearestMode
+    return selected
 end
 
 RegisterNetEvent('pma-voice:setTalkingMode', function(mode)
@@ -22,7 +22,7 @@ end)
 
 RegisterNetEvent('pma-voice:setVoiceProperty', function(property, value)
     if property ~= 'proximity' then return end
-    currentMode = modeFromDistance(tonumber(value) or Config.VoiceModes[2].range)
+    currentMode = modeFromDistance(value)
     UpdateVoice(currentMode, NetworkIsPlayerTalking(PlayerId()))
 end)
 

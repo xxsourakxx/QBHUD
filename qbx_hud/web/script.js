@@ -2,9 +2,9 @@ const state = {
   visible: true,
   paused: false,
   low: { health: 25, hunger: 20, thirst: 20, stress: 80 },
+  bleeding: { max: 4, pulseFromLevel: 2 },
   values: {
     health: 100,
-    armor: 0,
     hunger: 100,
     thirst: 100,
     stress: 0,
@@ -12,21 +12,22 @@ const state = {
 };
 
 const hud = document.getElementById('hud');
-const stressRow = document.getElementById('stress-row');
-const voicePanel = document.getElementById('voicePanel');
+const voiceChip = document.getElementById('voiceChip');
+const voiceIcon = document.getElementById('voiceIcon');
 const voiceLabel = document.getElementById('voiceLabel');
 const voiceRange = document.getElementById('voiceRange');
-const voiceIcon = document.getElementById('voiceIcon');
+const bleedChip = document.getElementById('bleedChip');
+const bleedText = document.getElementById('bleedText');
+const bleedDots = document.getElementById('bleedDots');
 
 const rows = {
-  health: document.querySelector(".status-row[data-key='health']"),
-  armor: document.querySelector(".status-row[data-key='armor']"),
-  hunger: document.querySelector(".status-row[data-key='hunger']"),
-  thirst: document.querySelector(".status-row[data-key='thirst']"),
-  stress: document.querySelector(".status-row[data-key='stress']"),
+  health: document.querySelector(".stat-chip[data-key='health']"),
+  hunger: document.querySelector(".stat-chip[data-key='hunger']"),
+  thirst: document.querySelector(".stat-chip[data-key='thirst']"),
+  stress: document.querySelector(".stat-chip[data-key='stress']"),
 };
 
-function setCss(name, value) {
+function setVar(name, value) {
   document.documentElement.style.setProperty(name, value);
 }
 
@@ -40,34 +41,60 @@ function renderVisibility() {
 }
 
 function updateStatus(key, value) {
-  const percent = clamp(value);
-  if (state.values[key] === percent) return;
-  state.values[key] = percent;
+  const safe = clamp(value);
+  if (state.values[key] === safe) return;
+  state.values[key] = safe;
 
   const fill = document.getElementById(`bar-${key}`);
   const valueEl = document.getElementById(`value-${key}`);
   if (!fill || !valueEl) return;
 
-  fill.style.width = `${percent}%`;
-  valueEl.textContent = `${Math.round(percent)}%`;
+  fill.style.width = `${safe}%`;
+  valueEl.textContent = `${Math.round(safe)}%`;
 
-  if (rows[key]) {
-    const isLow = key === 'stress' ? percent >= state.low.stress : percent <= (state.low[key] ?? -1);
-    rows[key].classList.toggle('low', isLow);
+  if (!rows[key]) return;
+  const threshold = state.low[key] ?? 0;
+  const isLow = key === 'stress' ? safe >= threshold : safe <= threshold;
+  rows[key].classList.toggle('low', isLow);
+}
+
+function buildBleedDots(max) {
+  bleedDots.innerHTML = '';
+  for (let i = 0; i < max; i += 1) {
+    const dot = document.createElement('span');
+    bleedDots.appendChild(dot);
   }
 }
 
-function updateVoice(data) {
-  const label = data.label || 'Normal';
-  const icon = data.icon || '🔉';
-  voiceLabel.textContent = `${icon} ${label}`;
-  voiceRange.textContent = `${Number(data.range || 8).toFixed(1)}m`;
+function updateBleeding(data) {
+  const level = Math.max(0, Math.min(data.max ?? state.bleeding.max, Number(data.level) || 0));
+  const max = Number(data.max) || state.bleeding.max;
 
-  const color = data.color || '#60ffc6';
-  voiceIcon.style.filter = `drop-shadow(0 0 7px ${color})`;
+  if (max !== state.bleeding.max || bleedDots.children.length !== max) {
+    state.bleeding.max = max;
+    buildBleedDots(max);
+  }
+
+  const labels = ['None', 'Minor', 'Light', 'Heavy', 'Critical'];
+  bleedText.textContent = `Bleeding: ${labels[level] || `Level ${level}`}`;
+
+  [...bleedDots.children].forEach((dot, index) => {
+    dot.classList.toggle('active', index < level);
+  });
+
+  bleedChip.classList.toggle('active', level >= (state.bleeding.pulseFromLevel ?? 2));
+}
+
+function updateVoice(data) {
+  const color = data.color || '#74ffc4';
+  voiceLabel.textContent = data.label || 'Normal';
+  voiceRange.textContent = `${Number(data.range || 8).toFixed(1)}m`;
+  voiceIcon.src = data.icon || 'assets/icons/voice-normal.svg';
+
   voiceLabel.style.color = color;
-  voicePanel.style.boxShadow = `0 0 14px ${color}40`;
-  voicePanel.classList.toggle('talking', Boolean(data.talking));
+  voiceIcon.style.filter = `drop-shadow(0 0 8px ${color})`;
+  voiceChip.style.boxShadow = `0 0 16px ${color}36`;
+  voiceChip.classList.toggle('talking', Boolean(data.talking));
 }
 
 function applyConfig(config) {
@@ -75,57 +102,58 @@ function applyConfig(config) {
     hud.classList.add('bottom-left');
   }
 
-  setCss('--bar-width', `${config.barWidth}px`);
-  setCss('--bar-height', `${config.barHeight}px`);
-  setCss('--bar-spacing', `${config.barSpacing}px`);
-  setCss('--bar-radius', `${config.barRadius}px`);
-  setCss('--anim-speed', `${config.animationSpeed}ms`);
-  setCss('--panel-opacity', String(config.panelOpacity));
-
-  if (config.theme) {
-    setCss('--health', config.theme.health);
-    setCss('--armor', config.theme.armor);
-    setCss('--hunger', config.theme.hunger);
-    setCss('--thirst', config.theme.thirst);
-    setCss('--stress', config.theme.stress);
-    setCss('--panel-bg', config.theme.panel);
-    setCss('--text-main', config.theme.text);
-    setCss('--text-muted', config.theme.muted);
-    setCss('--accent', config.theme.accent);
-  }
-
-  if (typeof config.enableStress === 'boolean') {
-    stressRow.style.display = config.enableStress ? 'flex' : 'none';
-  }
-
-  if (config.low) {
-    state.low = { ...state.low, ...config.low };
-  }
-
   if (config.offsetX !== undefined) hud.style.left = `${config.offsetX}vw`;
   if (config.offsetY !== undefined) hud.style.bottom = `${config.offsetY}vh`;
+
+  if (config.barWidth) setVar('--bar-width', `${config.barWidth}px`);
+  if (config.barHeight) setVar('--bar-height', `${config.barHeight}px`);
+  if (config.barGap) setVar('--bar-gap', `${config.barGap}px`);
+  if (config.animationSpeed) setVar('--anim', `${config.animationSpeed}ms`);
+  if (config.panelOpacity !== undefined) setVar('--panel-opacity', String(config.panelOpacity));
+
+  if (config.low) state.low = { ...state.low, ...config.low };
+  if (config.bleeding) state.bleeding = { ...state.bleeding, ...config.bleeding };
+
+  if (config.theme) {
+    if (config.theme.panel) setVar('--panel-bg', config.theme.panel);
+    if (config.theme.text) setVar('--txt', config.theme.text);
+    if (config.theme.muted) setVar('--muted', config.theme.muted);
+    if (config.theme.health) setVar('--health', config.theme.health);
+    if (config.theme.hunger) setVar('--hunger', config.theme.hunger);
+    if (config.theme.thirst) setVar('--thirst', config.theme.thirst);
+    if (config.theme.stress) setVar('--stress', config.theme.stress);
+    if (config.theme.bleeding) setVar('--bleeding', config.theme.bleeding);
+  }
+
+  buildBleedDots(state.bleeding.max);
 }
 
 window.addEventListener('message', (event) => {
   const msg = event.data;
-  if (!msg || !msg.action) return;
+  if (!msg?.action) return;
 
   if (msg.action === 'status') updateStatus(msg.data.key, msg.data.value);
   if (msg.action === 'voice') updateVoice(msg.data);
+  if (msg.action === 'bleeding') updateBleeding(msg.data);
+  if (msg.action === 'config') applyConfig(msg.data);
+
   if (msg.action === 'toggle') {
     state.visible = Boolean(msg.data.visible);
     renderVisibility();
   }
+
   if (msg.action === 'pause') {
     state.paused = Boolean(msg.data.paused);
     renderVisibility();
   }
-  if (msg.action === 'config') applyConfig(msg.data);
+
   if (msg.action === 'reset') {
     hud.style.left = '';
     hud.style.bottom = '';
   }
 });
 
+buildBleedDots(state.bleeding.max);
 Object.keys(state.values).forEach((key) => updateStatus(key, state.values[key]));
+updateBleeding({ level: 0, max: state.bleeding.max });
 renderVisibility();

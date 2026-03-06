@@ -1,13 +1,12 @@
 local HUD_VISIBLE = true
 local STATE = {
     health = 100,
-    armor = 0,
     hunger = 100,
     thirst = 100,
     stress = 0,
+    bleeding = 0,
     voiceMode = 2,
-    talking = false,
-    paused = false
+    talking = false
 }
 
 local function sendUI(action, payload)
@@ -21,25 +20,31 @@ local function applyConfig()
         offsetY = Config.OffsetY,
         barWidth = Config.BarWidth,
         barHeight = Config.BarHeight,
-        barSpacing = Config.BarSpacing,
-        barRadius = Config.BarRadius,
+        barGap = Config.BarGap,
         panelOpacity = Config.PanelOpacity,
         animationSpeed = Config.AnimationSpeed,
-        enableStress = Config.EnableStress,
+        low = Config.LowThresholds,
         theme = Config.Theme,
-        low = Config.LowThresholds
+        bleeding = Config.Bleeding
     })
 end
 
 function UpdateHudValue(key, value)
-    value = math.max(0, math.min(100, math.floor(value + 0.5)))
-    if STATE[key] == value then return end
-    STATE[key] = value
-    sendUI('status', { key = key, value = value })
+    local clamped = math.max(0, math.min(100, math.floor((tonumber(value) or 0) + 0.5)))
+    if STATE[key] == clamped then return end
+    STATE[key] = clamped
+    sendUI('status', { key = key, value = clamped })
+end
+
+function UpdateBleeding(level)
+    local safeLevel = math.max(0, math.min(Config.Bleeding.maxLevel, math.floor((tonumber(level) or 0) + 0.5)))
+    if STATE.bleeding == safeLevel then return end
+    STATE.bleeding = safeLevel
+    sendUI('bleeding', { level = safeLevel, max = Config.Bleeding.maxLevel })
 end
 
 function UpdateVoice(mode, talking)
-    local mapped = Config.VoiceModes[mode] and mode or 2
+    local mapped = Config.VoiceModes[tonumber(mode) or 2] and (tonumber(mode) or 2) or 2
     local changed = false
 
     if STATE.voiceMode ~= mapped then
@@ -56,23 +61,22 @@ function UpdateVoice(mode, talking)
 
     local voiceData = Config.VoiceModes[STATE.voiceMode]
     sendUI('voice', {
-        mode = STATE.voiceMode,
         label = voiceData.label,
-        icon = voiceData.icon,
         color = voiceData.color,
-        talking = STATE.talking,
-        range = voiceData.range
+        icon = voiceData.icon,
+        range = voiceData.range,
+        talking = STATE.talking
     })
 end
 
-local function setHudVisible(toggle)
+local function setVisible(toggle)
     if HUD_VISIBLE == toggle then return end
     HUD_VISIBLE = toggle
     sendUI('toggle', { visible = HUD_VISIBLE })
 end
 
 RegisterCommand('hud', function()
-    setHudVisible(not HUD_VISIBLE)
+    setVisible(not HUD_VISIBLE)
 end, false)
 
 RegisterCommand('hudreset', function()
@@ -81,32 +85,32 @@ RegisterCommand('hudreset', function()
 end, false)
 
 RegisterNetEvent('qbx_hud:client:setStress', function(value)
-    if not Config.EnableStress then return end
-    UpdateHudValue('stress', tonumber(value) or 0)
+    UpdateHudValue('stress', value)
+end)
+
+RegisterNetEvent('qbx_hud:client:setBleeding', function(level)
+    UpdateBleeding(level)
 end)
 
 CreateThread(function()
     Wait(500)
     applyConfig()
 
-    for key, value in pairs(STATE) do
-        if key == 'voiceMode' or key == 'talking' or key == 'paused' then
-            goto continue
-        end
-        sendUI('status', { key = key, value = value })
-        ::continue::
-    end
-
-    UpdateVoice(STATE.voiceMode, STATE.talking)
+    sendUI('status', { key = 'health', value = STATE.health })
+    sendUI('status', { key = 'hunger', value = STATE.hunger })
+    sendUI('status', { key = 'thirst', value = STATE.thirst })
+    sendUI('status', { key = 'stress', value = STATE.stress })
+    sendUI('bleeding', { level = STATE.bleeding, max = Config.Bleeding.maxLevel })
     sendUI('toggle', { visible = HUD_VISIBLE })
+    UpdateVoice(STATE.voiceMode, false)
 end)
 
 CreateThread(function()
-    local lastPause = false
+    local paused = false
     while true do
-        local paused = IsPauseMenuActive()
-        if paused ~= lastPause then
-            lastPause = paused
+        local nowPaused = IsPauseMenuActive()
+        if nowPaused ~= paused then
+            paused = nowPaused
             sendUI('pause', { paused = paused })
         end
         Wait(Config.UpdateIntervals.pause)
