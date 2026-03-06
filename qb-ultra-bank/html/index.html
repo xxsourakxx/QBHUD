@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FiveBank Ultra</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="hidden">
+    <header>
+      <div>
+        <h1>FiveBank Digital</h1>
+        <p id="serverTime"></p>
+      </div>
+      <button id="closeBtn">✕</button>
+    </header>
+
+    <main>
+      <section class="glass profile">
+        <h2>Financial Identity</h2>
+        <div id="identityGrid"></div>
+      </section>
+
+      <section class="glass accounts">
+        <h2>Accounts</h2>
+        <div id="accounts"></div>
+      </section>
+
+      <section class="glass card-view">
+        <h2>Debit Card</h2>
+        <div class="card3d" id="card3d">
+          <div class="chip"></div>
+          <div id="cardNum">•••• •••• •••• ••••</div>
+          <div class="card-row">
+            <span id="cardHolder">ACCOUNT HOLDER</span>
+            <span id="cardExpiry">00/00</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="glass actions">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+          <input id="amount" type="number" placeholder="Amount" />
+          <input id="destination" type="text" placeholder="IBAN / Account" />
+          <select id="accountSelect"></select>
+          <button id="withdrawBtn">Withdraw</button>
+          <button id="depositBtn">Deposit</button>
+          <button id="transferBtn">Transfer</button>
+        </div>
+      </section>
+
+      <section class="glass loans">
+        <h2>Loans & Credit</h2>
+        <div id="loanSummary"></div>
+      </section>
+
+      <section class="glass transactions">
+        <h2>Transaction Feed</h2>
+        <div id="txFeed"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
