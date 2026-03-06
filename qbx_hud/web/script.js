@@ -3,11 +3,13 @@ const state = {
   paused: false,
   low: { health: 25, hunger: 20, thirst: 20, stress: 80 },
   bleeding: { max: 4, pulseFromLevel: 2 },
+  speedometer: { enabled: true, unit: 'KM/H' },
   values: {
     health: 100,
     hunger: 100,
     thirst: 100,
     stress: 0,
+    speed: 0,
   },
 };
 
@@ -19,6 +21,9 @@ const voiceRange = document.getElementById('voiceRange');
 const bleedChip = document.getElementById('bleedChip');
 const bleedText = document.getElementById('bleedText');
 const bleedDots = document.getElementById('bleedDots');
+const speedChip = document.getElementById('speedChip');
+const speedValue = document.getElementById('speedValue');
+const speedUnit = document.getElementById('speedUnit');
 
 const rows = {
   health: document.querySelector(".stat-chip[data-key='health']"),
@@ -58,6 +63,19 @@ function updateStatus(key, value) {
   rows[key].classList.toggle('low', isLow);
 }
 
+function updateSpeed(data) {
+  const speed = Math.max(0, Math.floor(Number(data.value) || 0));
+  const unit = data.unit || state.speedometer.unit;
+
+  if (state.values.speed === speed && state.speedometer.unit === unit) return;
+  state.values.speed = speed;
+  state.speedometer.unit = unit;
+
+  speedValue.textContent = `${speed}`;
+  speedUnit.textContent = unit;
+  speedChip.classList.toggle('active', speed > 0);
+}
+
 function buildBleedDots(max) {
   bleedDots.innerHTML = '';
   for (let i = 0; i < max; i += 1) {
@@ -92,15 +110,12 @@ function updateVoice(data) {
   voiceIcon.src = data.icon || 'assets/icons/voice-normal.svg';
 
   voiceLabel.style.color = color;
-  voiceIcon.style.filter = `drop-shadow(0 0 8px ${color})`;
-  voiceChip.style.boxShadow = `0 0 16px ${color}36`;
+  voiceIcon.style.filter = `drop-shadow(0 0 7px ${color})`;
   voiceChip.classList.toggle('talking', Boolean(data.talking));
 }
 
 function applyConfig(config) {
-  if (config.position === 'bottom-left') {
-    hud.classList.add('bottom-left');
-  }
+  if (config.position === 'bottom-left') hud.classList.add('bottom-left');
 
   if (config.offsetX !== undefined) hud.style.left = `${config.offsetX}vw`;
   if (config.offsetY !== undefined) hud.style.bottom = `${config.offsetY}vh`;
@@ -113,9 +128,11 @@ function applyConfig(config) {
 
   if (config.low) state.low = { ...state.low, ...config.low };
   if (config.bleeding) state.bleeding = { ...state.bleeding, ...config.bleeding };
+  if (config.speedometer) state.speedometer = { ...state.speedometer, ...config.speedometer };
 
   if (config.theme) {
     if (config.theme.panel) setVar('--panel-bg', config.theme.panel);
+    if (config.theme.chip) setVar('--chip-bg', config.theme.chip);
     if (config.theme.text) setVar('--txt', config.theme.text);
     if (config.theme.muted) setVar('--muted', config.theme.muted);
     if (config.theme.health) setVar('--health', config.theme.health);
@@ -123,8 +140,11 @@ function applyConfig(config) {
     if (config.theme.thirst) setVar('--thirst', config.theme.thirst);
     if (config.theme.stress) setVar('--stress', config.theme.stress);
     if (config.theme.bleeding) setVar('--bleeding', config.theme.bleeding);
+    if (config.theme.speed) setVar('--speed', config.theme.speed);
   }
 
+  speedChip.style.display = state.speedometer.enabled ? 'flex' : 'none';
+  speedUnit.textContent = state.speedometer.unit;
   buildBleedDots(state.bleeding.max);
 }
 
@@ -133,6 +153,7 @@ window.addEventListener('message', (event) => {
   if (!msg?.action) return;
 
   if (msg.action === 'status') updateStatus(msg.data.key, msg.data.value);
+  if (msg.action === 'speed') updateSpeed(msg.data);
   if (msg.action === 'voice') updateVoice(msg.data);
   if (msg.action === 'bleeding') updateBleeding(msg.data);
   if (msg.action === 'config') applyConfig(msg.data);
@@ -154,6 +175,7 @@ window.addEventListener('message', (event) => {
 });
 
 buildBleedDots(state.bleeding.max);
-Object.keys(state.values).forEach((key) => updateStatus(key, state.values[key]));
+Object.keys(rows).forEach((key) => updateStatus(key, state.values[key]));
 updateBleeding({ level: 0, max: state.bleeding.max });
+updateSpeed({ value: 0, unit: state.speedometer.unit });
 renderVisibility();

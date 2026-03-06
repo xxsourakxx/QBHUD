@@ -1,6 +1,7 @@
 :root {
-    --panel-opacity: 0.24;
-    --panel-bg: rgba(148, 203, 255, var(--panel-opacity));
+    --panel-opacity: 0.16;
+    --panel-bg: rgba(180, 225, 255, var(--panel-opacity));
+    --chip-bg: rgba(255, 255, 255, 0.045);
     --txt: #e8f6ff;
     --muted: #93a9bc;
 
@@ -9,11 +10,12 @@
     --thirst: #78e7ff;
     --stress: #c88dff;
     --bleeding: #ff4d67;
+    --speed: #7dffdf;
 
-    --bar-width: 118px;
+    --bar-width: 112px;
     --bar-height: 8px;
     --bar-gap: 7px;
-    --anim: 170ms;
+    --anim: 160ms;
 }
 
 * { box-sizing: border-box; user-select: none; }
@@ -49,24 +51,24 @@ html, body {
     display: flex;
     align-items: center;
     gap: var(--bar-gap);
-    padding: 6px;
+    padding: 5px;
     border-radius: 999px;
-    background: linear-gradient(125deg, rgba(255, 255, 255, 0.09), var(--panel-bg));
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 0 14px rgba(130, 219, 255, 0.16);
+    background: linear-gradient(130deg, rgba(255, 255, 255, 0.06), var(--panel-bg));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
 
 .stat-chip,
 .voice-chip,
-.bleed-chip {
+.bleed-chip,
+.speed-chip {
     display: flex;
     align-items: center;
     gap: 6px;
-    min-height: 31px;
+    min-height: 30px;
     padding: 4px 8px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--chip-bg);
 }
 
 .chip-icon {
@@ -88,7 +90,7 @@ html, body {
     height: 100%;
     border-radius: inherit;
     transition: width var(--anim) ease, box-shadow var(--anim) ease;
-    box-shadow: 0 0 10px currentColor;
+    box-shadow: 0 0 8px currentColor;
 }
 
 #bar-health { background: linear-gradient(90deg, #ff93a2, var(--health)); color: var(--health); }
@@ -107,28 +109,40 @@ html, body {
     animation: dangerPulse 1.2s ease infinite;
 }
 
-.voice-chip {
-    min-width: 100px;
+.voice-chip,
+.speed-chip {
+    min-width: 96px;
 }
 
-.voice-meta {
+.voice-meta,
+.speed-meta {
     display: flex;
     flex-direction: column;
-    line-height: 1.05;
+    line-height: 1.02;
 }
 
-#voiceLabel {
+#voiceLabel,
+#speedValue {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
-#voiceRange {
+#voiceRange,
+#speedUnit {
     font-size: 9px;
     color: var(--muted);
 }
 
 .voice-chip.talking {
     animation: voicePulse 0.58s ease infinite;
+}
+
+.speed-chip.active {
+    box-shadow: inset 0 0 0 1px rgba(125, 255, 223, 0.25);
+}
+
+#speedValue {
+    color: var(--speed);
 }
 
 .bleed-chip {
@@ -150,13 +164,13 @@ html, body {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.24);
     transition: background var(--anim) ease, box-shadow var(--anim) ease;
 }
 
 .bleed-dots span.active {
     background: var(--bleeding);
-    box-shadow: 0 0 8px rgba(255, 77, 103, 0.8);
+    box-shadow: 0 0 7px rgba(255, 77, 103, 0.78);
 }
 
 .bleed-chip.active {
@@ -169,6 +183,6 @@ html, body {
 }
 
 @keyframes voicePulse {
-    0%, 100% { box-shadow: 0 0 12px rgba(116, 255, 196, 0.16); }
-    50% { box-shadow: 0 0 18px rgba(116, 255, 196, 0.34); }
+    0%, 100% { box-shadow: inset 0 0 0 1px rgba(116, 255, 196, 0.18); }
+    50% { box-shadow: inset 0 0 0 1px rgba(116, 255, 196, 0.38); }
 }

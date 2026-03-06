@@ -15,19 +15,19 @@ local function syncMetadata()
     local stress = getMetaValue('stress')
     local bleeding = getMetaValue('bleeding') or getMetaValue('isbleeding')
 
-    if hunger then UpdateHudValue('hunger', hunger) end
-    if thirst then UpdateHudValue('thirst', thirst) end
-    if stress then UpdateHudValue('stress', stress) end
-    if bleeding then UpdateBleeding(bleeding) end
+    if hunger ~= nil then UpdateHudValue('hunger', hunger) end
+    if thirst ~= nil then UpdateHudValue('thirst', thirst) end
+    if stress ~= nil then UpdateHudValue('stress', stress) end
+    if bleeding ~= nil then UpdateBleeding(bleeding) end
 end
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', syncMetadata)
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(playerData)
     if type(playerData) ~= 'table' or type(playerData.metadata) ~= 'table' then return end
 
-    if playerData.metadata.hunger then UpdateHudValue('hunger', playerData.metadata.hunger) end
-    if playerData.metadata.thirst then UpdateHudValue('thirst', playerData.metadata.thirst) end
-    if playerData.metadata.stress then UpdateHudValue('stress', playerData.metadata.stress) end
+    if playerData.metadata.hunger ~= nil then UpdateHudValue('hunger', playerData.metadata.hunger) end
+    if playerData.metadata.thirst ~= nil then UpdateHudValue('thirst', playerData.metadata.thirst) end
+    if playerData.metadata.stress ~= nil then UpdateHudValue('stress', playerData.metadata.stress) end
 
     local bleed = playerData.metadata.bleeding or playerData.metadata.isbleeding
     if bleed ~= nil then UpdateBleeding(bleed) end
