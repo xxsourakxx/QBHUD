@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'QBHUD'
 description 'Ultra realistic modular banking ecosystem for QBCore'
-version '1.0.0'
+version '1.0.1'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -29,5 +29,8 @@ files {
 }
 
 dependencies {
-    'qb-core'
+    'qb-core',
+    'qb-target',
+    'oxmysql',
+    'ox_lib'
 }

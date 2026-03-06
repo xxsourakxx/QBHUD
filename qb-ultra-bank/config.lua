@@ -55,3 +55,16 @@ Config.ATMModels = {
     `prop_atm_03`,
     `prop_fleeca_atm`
 }
+
+Config.UseTargetForBanks = true
+Config.ShowBankBlips = true
+Config.BankInteractDistance = 2.0
+
+Config.BankLocations = {
+    { label = 'Legion Fleeca', coords = vector3(149.88, -1040.89, 29.37), blip = 108 },
+    { label = 'Hawick Fleeca', coords = vector3(313.47, -278.81, 54.17), blip = 108 },
+    { label = 'Del Perro Fleeca', coords = vector3(-1212.98, -330.84, 37.79), blip = 108 },
+    { label = 'Rockford Hills Fleeca', coords = vector3(-351.34, -49.63, 49.04), blip = 108 },
+    { label = 'Alta Fleeca', coords = vector3(1175.07, 2706.41, 38.09), blip = 108 },
+    { label = 'Paleto Bay Bank', coords = vector3(-111.2, 6469.42, 31.63), blip = 108 }
+}
