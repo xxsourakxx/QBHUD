@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>qbx_hud</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <main id="hud" class="hud bottom-left">
+        <section class="hud-strip" id="hudStrip">
+            <article class="stat-chip" data-key="health">
+                <img src="assets/icons/health.svg" alt="health" class="chip-icon" />
+                <div class="chip-meter"><div class="chip-fill" id="bar-health"></div></div>
+                <span id="value-health" class="chip-value">100%</span>
+            </article>
+
+            <article class="stat-chip" data-key="hunger">
+                <img src="assets/icons/hunger.svg" alt="food" class="chip-icon" />
+                <div class="chip-meter"><div class="chip-fill" id="bar-hunger"></div></div>
+                <span id="value-hunger" class="chip-value">100%</span>
+            </article>
+
+            <article class="stat-chip" data-key="thirst">
+                <img src="assets/icons/thirst.svg" alt="drink" class="chip-icon" />
+                <div class="chip-meter"><div class="chip-fill" id="bar-thirst"></div></div>
+                <span id="value-thirst" class="chip-value">100%</span>
+            </article>
+
+            <article class="stat-chip" data-key="stress">
+                <img src="assets/icons/stress.svg" alt="stress" class="chip-icon" />
+                <div class="chip-meter"><div class="chip-fill" id="bar-stress"></div></div>
+                <span id="value-stress" class="chip-value">0%</span>
+            </article>
+
+            <article class="bleed-chip" id="bleedChip">
+                <img src="assets/icons/bleeding.svg" alt="bleeding" class="chip-icon" />
+                <span id="bleedText">Bleeding: None</span>
+                <div class="bleed-dots" id="bleedDots"></div>
+            </article>
+
+            <article class="speed-chip" id="speedChip">
+                <img src="assets/icons/speed.svg" alt="speed" class="chip-icon" />
+                <div class="speed-meta">
+                    <span id="speedValue">0</span>
+                    <small id="speedUnit">KM/H</small>
+                </div>
+            </article>
+
+            <article class="voice-chip" id="voiceChip">
+                <img id="voiceIcon" src="assets/icons/voice-normal.svg" alt="voice" class="chip-icon" />
+                <div class="voice-meta">
+                    <span id="voiceLabel">Normal</span>
+                    <small id="voiceRange">8.0m</small>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
